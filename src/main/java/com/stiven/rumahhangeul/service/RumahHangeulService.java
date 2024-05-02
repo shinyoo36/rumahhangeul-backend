@@ -109,7 +109,7 @@ public class RumahHangeulService {
         Optional<User> existingUserOptional = userRepository.findById(id);
         if (existingUserOptional.isEmpty()) {
             authDto = AuthDto.builder()
-                    .message("User not found\n")
+                    .message("Pengguna tidak ditemukan\n")
                     .userProjection(userProjection)
                     .build();
             return authDto;
@@ -151,7 +151,7 @@ public class RumahHangeulService {
         // Check if the user exists
         Optional<User> existingUserOptional = userRepository.findById(id);
         if (existingUserOptional.isEmpty()) {
-            errorMessage.append("User not found\n");
+            errorMessage.append("Pengguna tidak ditemukan\n");
             return ResponseEntity.badRequest().body(errorMessage.toString().trim());
         }
 
@@ -169,7 +169,7 @@ public class RumahHangeulService {
 
         Optional<User> existingUserOptional = userRepository.findById(id);
         if (existingUserOptional.isEmpty()) {
-            errorMessage.append("User not found\n");
+            errorMessage.append("Pengguna tidak ditemukan\n");
             return ResponseEntity.badRequest().body(errorMessage.toString().trim());
         }
 
@@ -238,9 +238,9 @@ public class RumahHangeulService {
 
         String message;
         if (challengeDto.getPerfectClear().equals("yes")) {
-            message= "Hebat! Tantangan " + challengeDto.getNamaChallenge() + " diselesaikan dengan sempurna";
+            message= "Hebat! Kuis " + challengeDto.getNamaChallenge() + " diselesaikan dengan sempurna";
         } else {
-            message= "Tantangan " + challengeDto.getNamaChallenge() + " diselesaikan";
+            message= "Kuis " + challengeDto.getNamaChallenge() + " diselesaikan";
         }
 
         return ResponseEntity.ok(message);
