@@ -11,4 +11,8 @@ public class UserDto {
     private String password;
     private String email;
     private Long score;
+    private Long point;
+    private String newBorder;
+    private String newProfile;
+
 }

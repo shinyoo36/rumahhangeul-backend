@@ -19,49 +19,48 @@ public class RumahHangeulController {
 
     @PostMapping(value = "/register")
     @ResponseStatus(value = HttpStatus.CREATED)
-    public ResponseEntity<String> registerUser(@Validated @RequestBody UserCreateDto userCreateDto) {
+    public ResponseEntity<String> registerUser(@Validated @RequestBody UserDto userCreateDto) {
         return rumahHangeulService.registerUser(userCreateDto);
     }
     @PostMapping(value = "/login")
     @ResponseStatus(value = HttpStatus.OK)
     public AuthDto loginUser (@Validated @RequestBody LoginDto loginDto){
-        return rumahHangeulService.authenticateUser(loginDto);
+        return rumahHangeulService.loginUser(loginDto);
     }
     @GetMapping(value = "/user/profile/{userId}")
     @ResponseStatus(value = HttpStatus.OK)
     public UserProjection findUserProfile (@PathVariable Long userId){
-        return rumahHangeulService.findByUserId(userId);
+        return rumahHangeulService.findUserProfile(userId);
     }
-
 
     @PostMapping(value = "/user/profile/{id}/item")
     @ResponseStatus(value = HttpStatus.OK)
-    public ResponseEntity<String> updateOrAddUserItems(@Validated @RequestBody ItemDto itemDto, @PathVariable Long id) {
-        return rumahHangeulService.updateOrAddUserItems(itemDto, id);
+    public ResponseEntity<String> updateOrAddUserItem(@Validated @RequestBody ItemDto itemDto, @PathVariable Long id) {
+        return rumahHangeulService.updateOrAddUserItem(itemDto, id);
     }
     @PostMapping(value = "/user/profile/{id}/course")
     @ResponseStatus(value = HttpStatus.OK)
-    public ResponseEntity<String> updateOrAddUserCourses(@Validated @RequestBody CourseDto courseDto, @PathVariable Long id) {
-        return rumahHangeulService.updateOrAddUserCourses(courseDto, id);
+    public ResponseEntity<String> updateOrAddUserCourse(@Validated @RequestBody CourseDto courseDto, @PathVariable Long id) {
+        return rumahHangeulService.updateOrAddUserCourse(courseDto, id);
     }
     @PostMapping(value = "/user/profile/{id}/challenge")
     @ResponseStatus(value = HttpStatus.OK)
-    public ResponseEntity<String> updateOrAddUserChallenges(@Validated @RequestBody ChallengeDto challengeDto, @PathVariable Long id) {
-        return rumahHangeulService.updateOrAddUserChallenges(challengeDto, id);
+    public ResponseEntity<String> updateOrAddUserChallenge(@Validated @RequestBody ChallengeDto challengeDto, @PathVariable Long id) {
+        return rumahHangeulService.updateOrAddUserChallenge(challengeDto, id);
     }
 
 
     @PatchMapping(value = "/user/profile/{id}/update")
-    public AuthDto updateUser(@Validated @RequestBody UserUpdateDto userUpdateDto, @PathVariable Long id) {
+    public ResponseEntity<String> updateUser(@Validated @RequestBody UserDto userUpdateDto, @PathVariable Long id) {
         return rumahHangeulService.updateUser(userUpdateDto, id);
     }
     @PatchMapping(value = "/user/profile/{id}/update-score")
-    public ResponseEntity<String> updateUserScore(@Validated @RequestBody UserScoreDto userScoreDto, @PathVariable Long id) {
+    public ResponseEntity<String> updateUserScore(@Validated @RequestBody UserDto userScoreDto, @PathVariable Long id) {
         return rumahHangeulService.updateUserScore(userScoreDto, id);
     }
     @PatchMapping(value = "/user/profile/{id}/profil")
-    public ResponseEntity<String> updateUserProfile(@PathVariable Long id, @RequestBody UserEditProfileDto userEditProfileDto) {
-        return rumahHangeulService.updateUserProfil(userEditProfileDto, id);
+    public ResponseEntity<String> updateUserProfile(@PathVariable Long id, @RequestBody UserDto userEditProfileDto) {
+        return rumahHangeulService.updateUserProfile(userEditProfileDto, id);
     }
 
 
@@ -72,17 +71,17 @@ public class RumahHangeulController {
     }
     @GetMapping(value = "/users/profile/{id}/courses")
     @ResponseStatus(value = HttpStatus.OK)
-    public List<Course> findUserCourseByUserId(@PathVariable Long id) {
-        return rumahHangeulService.findUserCourseByUserId(id);
+    public List<Course> findAllUserCourseByUserId(@PathVariable Long id) {
+        return rumahHangeulService.findAllUserCourseByUserId(id);
     }
     @GetMapping(value = "/users/profile/{id}/challenges")
     @ResponseStatus(value = HttpStatus.OK)
-    public List<Challenge> findUserChallengeByUserId(@PathVariable Long id) {
-        return rumahHangeulService.findUserChallengeByUserId(id);
+    public List<Challenge> findAllUserChallengeByUserId(@PathVariable Long id) {
+        return rumahHangeulService.findAllUserChallengeByUserId(id);
     }
     @GetMapping(value = "/users/profile/{id}/items")
     @ResponseStatus(value = HttpStatus.OK)
-    public List<Item> findUserItemByUserId(@PathVariable Long id) {
-        return rumahHangeulService.findUserItemByUserId(id);
+    public List<Item> findAllUserItemByUserId(@PathVariable Long id) {
+        return rumahHangeulService.findAllUserItemByUserId(id);
     }
 }

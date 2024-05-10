@@ -26,12 +26,12 @@ public class Challenge {
     @JoinColumn(name = "user_id")
     private User user;
     @Column(name = "nama_challenge")
-    String namaChallenge;
+    private String namaChallenge;
     @Column(name = "first_clear")
-    String firstClear;
+    private String firstClear;
     @Column(name = "perfect_clear")
-    String perfectClear;
+    private String perfectClear;
     @Column(name = "gambar_url")
-    String gambarUrl;
+    private String gambarUrl;
 
 }

@@ -27,10 +27,10 @@ public class Item {
     @JoinColumn(name = "user_id")
     private User user;
     @Column(name = "tipe_item")
-    String tipeItem;
+    private String tipeItem;
     @Column(name = "nama_item")
-    String namaItem;
+    private String namaItem;
     @Column(name = "value_item")
-    String valueItem;
+    private String valueItem;
 
 }

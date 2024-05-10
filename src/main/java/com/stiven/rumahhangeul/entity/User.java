@@ -29,22 +29,22 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Item> items = new ArrayList<>();
     @Column(name = "username")
-    String username;
+    private String username;
     @Column(name = "nama_depan")
-    String namaDepan;
+    private String namaDepan;
     @Column(name = "nama_belakang")
-    String namaBelakang;
+    private String namaBelakang;
     @Column(name = "password")
-    String password;
+    private String password;
     @Column(name = "email")
-    String email;
+    private String email;
     @Column(name = "score")
-    Long score;
+    private Long score;
     @Column(name = "point")
-    Long point;
+    private Long point;
     @Column(name = "border_used")
-    String borderUsed;
+    private String borderUsed;
     @Column(name = "profile_used")
-    String profileUsed;
+    private String profileUsed;
 
 }

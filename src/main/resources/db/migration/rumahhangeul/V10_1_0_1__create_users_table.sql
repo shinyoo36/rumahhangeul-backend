@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS users (
     PRIMARY KEY (id)
 );
 
-CREATE TABLE IF NOT EXISTS user_challenges (
+CREATE TABLE IF NOT EXISTS challenges (
     id                                  BIGSERIAL,
     user_id	                            BIGINT          NOT NULL,
     nama_challenge                      VARCHAR(20)     NOT NULL,
@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS user_challenges (
     PRIMARY KEY (id,
 );
 
-CREATE TABLE IF NOT EXISTS user_courses (
+CREATE TABLE IF NOT EXISTS courses (
     id                                  BIGSERIAL,
     user_id	                            BIGINT          NOT NULL,
     nama_course                         VARCHAR(20)     NOT NULL,
@@ -36,6 +36,6 @@ CREATE TABLE IF NOT EXISTS items (
     user_id	                            BIGINT          NOT NULL,
     tipe_item                           VARCHAR(20)     NOT NULL,
     nama_item                           VARCHAR(20)     NOT NULL,
-    valueItem                           VARCHAR(20)     NOT NULL,
+    value_item                           VARCHAR(20)     NOT NULL,
     PRIMARY KEY (id,
 );

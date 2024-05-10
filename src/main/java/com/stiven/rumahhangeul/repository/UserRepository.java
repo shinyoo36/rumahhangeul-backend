@@ -22,6 +22,4 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     List<UserProjection> findAllByOrderByScoreDescNamaDepanAsc();
 
-    User save(User user);
-
 }

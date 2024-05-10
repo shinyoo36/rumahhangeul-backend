@@ -20,7 +20,7 @@ public class RumahHangeulService {
     private final CourseRepository courseRepository;
     private final ItemRepository itemRepository;
 
-    public ResponseEntity<String> registerUser(UserCreateDto userCreateDto) {
+    public ResponseEntity<String> registerUser(UserDto userCreateDto) {
         StringBuilder errorMessage = new StringBuilder();
 
         Optional<User> existingUserOptional = userRepository.findByUsername(userCreateDto.getUsername());
@@ -54,7 +54,8 @@ public class RumahHangeulService {
 
         return ResponseEntity.badRequest().body(errorMessage.toString().trim());
     }
-    public AuthDto authenticateUser(LoginDto loginDto) {
+
+    public AuthDto loginUser(LoginDto loginDto) {
         Optional<User> optionalUser = userRepository.findByUsername(loginDto.getUsername());
 
         if (optionalUser.isPresent()) {
@@ -63,7 +64,6 @@ public class RumahHangeulService {
                 Optional<UserProjection> optionalUserProjection = userRepository.findByUsernameAndPassword(loginDto.getUsername(), user.getPassword());
                 if (optionalUserProjection.isPresent()) {
                     UserProjection userProjection = optionalUserProjection.get();
-                    userRepository.save(user);
 
                     return AuthDto.builder()
                             .message("Berhasil Login")
@@ -77,198 +77,144 @@ public class RumahHangeulService {
                 .userProjection(null)
                 .build();
     }
-    public UserProjection findByUserId(Long userId) {
-        Optional<UserProjection> optionalUserProjection = userRepository.findByUserId(userId);
-        UserProjection userProjection = null;
-        if(optionalUserProjection.isPresent()){
-            userProjection = optionalUserProjection.get();
-        }
-        return userProjection;
+
+    public UserProjection findUserProfile(Long userId) {
+        return userRepository.findByUserId(userId).orElse(null);
     }
-
-
-    public List<Course> findUserCourseByUserId(Long userId) {
+    public List<Course> findAllUserCourseByUserId(Long userId) {
         return courseRepository.findAllByUserId(userId);
     }
-    public List<Challenge> findUserChallengeByUserId(Long userId) {
+    public List<Challenge> findAllUserChallengeByUserId(Long userId) {
         return challengeRepository.findAllByUserId(userId);
     }
-    public List<Item> findUserItemByUserId(Long userId) {
+    public List<Item> findAllUserItemByUserId(Long userId) {
         return itemRepository.findAllByUserId(userId);
     }
     public List<UserProjection> findAllUserForLeaderboard() {
         return userRepository.findAllByOrderByScoreDescNamaDepanAsc();
     }
 
-    public AuthDto updateUser(UserUpdateDto userUpdateDto, Long id) {
-        AuthDto authDto;
-        User existingUser;
-        Optional<UserProjection> optionalUserProjection = userRepository.findByUserId(id);
-        UserProjection userProjection = null;
-
+    public ResponseEntity<String> updateUser(UserDto userUpdateDto, Long id) {
         Optional<User> existingUserOptional = userRepository.findById(id);
         if (existingUserOptional.isEmpty()) {
-            authDto = AuthDto.builder()
-                    .message("Pengguna tidak ditemukan\n")
-                    .userProjection(userProjection)
-                    .build();
-            return authDto;
-        } else{
-            existingUser = existingUserOptional.get();
-        }
-
-        if(optionalUserProjection.isPresent()){
-            userProjection = optionalUserProjection.get();
-        }
-
-//        if (!existingUser.getEmail().equals(userUpdateDto.getEmail())) {
-//            Optional<User> existingEmailOptional = userRepository.findByEmail(userUpdateDto.getEmail());
-//            if (existingEmailOptional.isPresent()) {
-//                authDto = AuthDto.builder()
-//                        .message("Email is already registered\n")
-//                        .userProjection(userProjection)
-//                        .build();
-//                return authDto;
-//            }
-//        }
-
-        existingUser.setNamaDepan(userUpdateDto.getNamaDepan());
-        existingUser.setNamaBelakang(userUpdateDto.getNamaBelakang());
-//        existingUser.setEmail(userUpdateDto.getEmail());
-
-        userRepository.save(existingUser);
-
-        authDto = AuthDto.builder()
-                .message("Berhasil memperbarui profil")
-                .userProjection(userProjection)
-                .build();
-
-        return authDto;
-    }
-    public ResponseEntity<String> updateUserScore(UserScoreDto userScoreDto, Long id) {
-        StringBuilder errorMessage = new StringBuilder();
-
-        // Check if the user exists
-        Optional<User> existingUserOptional = userRepository.findById(id);
-        if (existingUserOptional.isEmpty()) {
-            errorMessage.append("Pengguna tidak ditemukan\n");
-            return ResponseEntity.badRequest().body(errorMessage.toString().trim());
+            return ResponseEntity.badRequest().body("Pengguna tidak ada");
         }
 
         User existingUser = existingUserOptional.get();
-
-        existingUser.setScore(existingUser.getScore() +userScoreDto.getScore());
-        existingUser.setPoint(existingUser.getPoint() +userScoreDto.getPoint());
-
+        existingUser.setNamaDepan(existingUser.getScore() + userUpdateDto.getNamaDepan());
+        existingUser.setNamaBelakang(existingUser.getPoint() + userUpdateDto.getNamaBelakang());
         userRepository.save(existingUser);
 
-        return ResponseEntity.ok("User Score updated successfully");
+        return ResponseEntity.ok("Berhasil memperbarui pengguna");
     }
-    public ResponseEntity<String> updateUserProfil(UserEditProfileDto userEditProfileDto, Long id) {
-        StringBuilder errorMessage = new StringBuilder();
 
+    public ResponseEntity<String> updateUserScore(UserDto userScoreDto, Long id) {
         Optional<User> existingUserOptional = userRepository.findById(id);
         if (existingUserOptional.isEmpty()) {
-            errorMessage.append("Pengguna tidak ditemukan\n");
-            return ResponseEntity.badRequest().body(errorMessage.toString().trim());
+            return ResponseEntity.badRequest().body("Pengguna tidak ada");
         }
 
         User existingUser = existingUserOptional.get();
-
-        existingUser.setProfileUsed(userEditProfileDto.getNewProfile());
-        existingUser.setBorderUsed(userEditProfileDto.getNewBorder());
-
+        existingUser.setScore(existingUser.getScore() + userScoreDto.getScore());
+        existingUser.setPoint(existingUser.getPoint() + userScoreDto.getPoint());
         userRepository.save(existingUser);
 
-        return ResponseEntity.ok("Profil pengguna berhasil diperbarui");
+        return ResponseEntity.ok("Skor dan poin berhasil diperbarui");
     }
 
-
-    public ResponseEntity<String> updateOrAddUserItems(ItemDto itemDto, Long id) {
+    public ResponseEntity<String> updateUserProfile(UserDto userEditProfileDto, Long id) {
         Optional<User> existingUserOptional = userRepository.findById(id);
-        User user;
         if (existingUserOptional.isPresent()) {
-            user = existingUserOptional.get();
-        } else{
-            return ResponseEntity.ok("Pengguna tidak ada");
-        }
-
-        String message;
-        Optional<Item> existingItemOptional = itemRepository.findByNamaItemAndUserId(itemDto.getNamaItem(), id);
-        if (existingItemOptional.isPresent()) {
-            message= "Anda sudah mempunyai " + itemDto.getTipeItem() + itemDto.getNamaItem();
-
+            User existingUser = existingUserOptional.get();
+            existingUser.setProfileUsed(userEditProfileDto.getNewProfile());
+            existingUser.setBorderUsed(userEditProfileDto.getNewBorder());
+            userRepository.save(existingUser);
+            return ResponseEntity.ok("Profil pengguna berhasil diperbarui");
         } else {
-            message= "Anda telah membeli " + itemDto.getTipeItem() + itemDto.getNamaItem();
-            Item item = Item.builder()
-                    .user(user)
-                    .namaItem(itemDto.getNamaItem())
-                    .tipeItem(itemDto.getTipeItem())
-                    .valueItem(itemDto.getValueItem())
-                    .build();
-            itemRepository.save(item);
+            return ResponseEntity.badRequest().body("Pengguna tidak ada");
         }
-
-        return ResponseEntity.ok(message);
     }
-    public ResponseEntity<String> updateOrAddUserChallenges(ChallengeDto challengeDto, Long id) {
+
+    public ResponseEntity<String> updateOrAddUserItem(ItemDto itemDto, Long id) {
         Optional<User> existingUserOptional = userRepository.findById(id);
-        User user;
+
         if (existingUserOptional.isPresent()) {
-            user = existingUserOptional.get();
-        } else{
-            return ResponseEntity.ok("Pengguna tidak ada");
-        }
+            User user = existingUserOptional.get();
 
-        Optional<Challenge> existingChallengeOptional = challengeRepository.findByNamaChallengeAndUserId(challengeDto.getNamaChallenge(), id);
-        if (existingChallengeOptional.isPresent()) {
-            Challenge existingChallenge = existingChallengeOptional.get();
-            existingChallenge.setPerfectClear(challengeDto.getPerfectClear());
-            challengeRepository.save(existingChallenge);
+            Optional<Item> existingItemOptional = itemRepository.findByNamaItemAndUserId(itemDto.getNamaItem(), id);
+            if (existingItemOptional.isPresent()) {
+                return ResponseEntity.ok("Anda sudah mempunyai " + itemDto.getTipeItem() + itemDto.getNamaItem());
+            } else {
+                Item item = Item.builder()
+                        .user(user)
+                        .namaItem(itemDto.getNamaItem())
+                        .tipeItem(itemDto.getTipeItem())
+                        .valueItem(itemDto.getValueItem())
+                        .build();
+                itemRepository.save(item);
+                return ResponseEntity.ok("Anda telah membeli " + itemDto.getTipeItem() + itemDto.getNamaItem());
+            }
         } else {
-            Challenge challenge = Challenge.builder()
-                    .user(user)
-                    .namaChallenge(challengeDto.getNamaChallenge())
-                    .firstClear(challengeDto.getFirstClear())
-                    .perfectClear(challengeDto.getPerfectClear())
-                    .gambarUrl(challengeDto.getGambarUrl())
-                    .build();
-            challengeRepository.save(challenge);
+            return ResponseEntity.badRequest().body("Pengguna tidak ada");
         }
-
-        String message;
-        if (challengeDto.getPerfectClear().equals("yes")) {
-            message= "Hebat! Kuis " + challengeDto.getNamaChallenge() + " diselesaikan dengan sempurna";
-        } else {
-            message= "Kuis " + challengeDto.getNamaChallenge() + " diselesaikan";
-        }
-
-        return ResponseEntity.ok(message);
     }
-    public ResponseEntity<String> updateOrAddUserCourses(CourseDto courseDto, Long id) {
+
+    public ResponseEntity<String> updateOrAddUserChallenge(ChallengeDto challengeDto, Long id) {
         Optional<User> existingUserOptional = userRepository.findById(id);
-        User user;
+
         if (existingUserOptional.isPresent()) {
-            user = existingUserOptional.get();
-        } else{
-            return ResponseEntity.ok("Pengguna tidak ada");
-        }
+            User user = existingUserOptional.get();
 
-        String message;
-        Optional<Course> existingCourseOptional = courseRepository.findByNamaCourseAndUserId(courseDto.getNamaCourse(), id);
-        if (existingCourseOptional.isPresent()) {
-            message= "Selamat Pelajaran " + courseDto.getNamaCourse() + " telah dipelajari ulang";
+            Optional<Challenge> existingChallengeOptional = challengeRepository.findByNamaChallengeAndUserId(challengeDto.getNamaChallenge(), id);
+            if (existingChallengeOptional.isPresent()) {
+                Challenge existingChallenge = existingChallengeOptional.get();
+                existingChallenge.setPerfectClear(challengeDto.getPerfectClear());
+                challengeRepository.save(existingChallenge);
+            } else {
+                Challenge challenge = Challenge.builder()
+                        .user(user)
+                        .namaChallenge(challengeDto.getNamaChallenge())
+                        .firstClear(challengeDto.getFirstClear())
+                        .perfectClear(challengeDto.getPerfectClear())
+                        .gambarUrl(challengeDto.getGambarUrl())
+                        .build();
+                challengeRepository.save(challenge);
+            }
+
+            String message;
+            if (challengeDto.getPerfectClear().equals("yes")) {
+                message = "Hebat! Kuis " + challengeDto.getNamaChallenge() + " diselesaikan dengan sempurna";
+            } else {
+                message = "Kuis " + challengeDto.getNamaChallenge() + " diselesaikan";
+            }
+
+            return ResponseEntity.ok(message);
         } else {
-            message= "Selamat Pelajaran " + courseDto.getNamaCourse() + " telah diselesaikan";
-            Course course = Course.builder()
-                    .user(user)
-                    .namaCourse(courseDto.getNamaCourse())
-                    .completed(courseDto.getCompleted())
-                    .gambarUrl(courseDto.getGambarUrl())
-                    .build();
-            courseRepository.save(course);
+            return ResponseEntity.badRequest().body("Pengguna tidak ada");
         }
+    }
 
-        return ResponseEntity.ok(message);
+    public ResponseEntity<String> updateOrAddUserCourse(CourseDto courseDto, Long id) {
+        Optional<User> existingUserOptional = userRepository.findById(id);
+
+        if (existingUserOptional.isPresent()) {
+            User user = existingUserOptional.get();
+
+            Optional<Course> existingCourseOptional = courseRepository.findByNamaCourseAndUserId(courseDto.getNamaCourse(), id);
+            if (existingCourseOptional.isPresent()) {
+                return ResponseEntity.ok("Selamat Pelajaran " + courseDto.getNamaCourse() + " telah dipelajari ulang");
+            } else {
+                Course course = Course.builder()
+                        .user(user)
+                        .namaCourse(courseDto.getNamaCourse())
+                        .completed(courseDto.getCompleted())
+                        .gambarUrl(courseDto.getGambarUrl())
+                        .build();
+                courseRepository.save(course);
+                return ResponseEntity.ok("Selamat Pelajaran " + courseDto.getNamaCourse() + " telah diselesaikan");
+            }
+        } else {
+            return ResponseEntity.badRequest().body("Pengguna tidak ada");
+        }
     }
 }

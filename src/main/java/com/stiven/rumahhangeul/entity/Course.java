@@ -26,10 +26,10 @@ public class Course {
     @JoinColumn(name = "user_id")
     private User user;
     @Column(name = "nama_course")
-    String namaCourse;
+    private String namaCourse;
     @Column(name = "completed")
-    String completed;
+    private String completed;
     @Column(name = "gambar_url")
-    String gambarUrl;
+    private String gambarUrl;
 
 }
